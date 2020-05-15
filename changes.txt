@@ -1,0 +1,24 @@
+2020-05-06-21-34-34
+  added fn's single_row and single_cell to db.hh
+  removed \r's from csv files
+  tao now long lived.
+  added local path to setup.sh
+  db.hh/cc +single_row +single_cell -single_query
+  moved mkt_t::dbstore from lib/bittrex.cc to lib/mkt.cc
+  updated jsons.
+  
+    
+2020-05-06-01-30-10
+  Gonna start analyzing data.  first, that means making sure I have it
+  all.  
+
+2020-05-05-02-59-40
+  Improved to/from json functions to handle nulls.
+
+  changed db reals to numeric(16,8), to get rid of scientific notation.
+
+  moved sql generation of out order.hh
+
+  changed bal_t to use load_json function. 
+
+

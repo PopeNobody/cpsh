@@ -1,0 +1,4 @@
+-ggdb3
+-O0
+-fPIC
+-std=c++17

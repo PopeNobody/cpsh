@@ -1,0 +1,1 @@
+set path=/home/rfp/include/,/usr/include/x86_64-linux-gnu/,/usr/local/bin/../lib/gcc/x86_64-linux-gnu/8/../../../../include/c++/8,/usr/local/bin/../lib/gcc/x86_64-linux-gnu/8/../../../../include/x86_64-linux-gnu/c++/8/bits,/usr/local/include,/usr/stow/llvm/lib/clang/11.0.0/include,inc,lib,src

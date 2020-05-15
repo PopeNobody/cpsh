@@ -1,0 +1,5 @@
+-I inc
+-I/home/rfp/include
+-DWITH_ICU
+-DSYSCONFDIR="\"/home/rfp/stow/bx/etc\""
+-Wc++17-extensions

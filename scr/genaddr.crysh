@@ -1,0 +1,12 @@
+
+
+
+mnemonic-to-seed 
+hd-new
+hd-private -d -i 44
+hd-private -d -i 0
+hd-private -d -i 0
+hd-public -i 0
+hd-public -i 0
+hd-to-ec 
+ec-to-address

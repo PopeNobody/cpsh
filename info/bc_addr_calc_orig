@@ -1,0 +1,18 @@
+SEED=$(bx mnemonic-to-seed "$@")
+HD_NEW=$(bx hd-new "$SEED")
+show_env() {
+	for i ; do echo "$i => ${!i}"; done
+}
+show_env SEED HD_NEW
+
+for COIN in 0 45 145; do
+	AE_PRI=$(bx hd-private -d -i "$PURPOSE" "$HD_NEW"  | bx hd-private -d -i $COIN | bx hd-private -d -i 0 )
+	ONEMORE=$(bx hd-public -i 0 "$AE_PRI")
+	TWOMORE=$(bx hd-public -i 0 "$ONEMORE")
+	EC_ADDR=$(bx hd-to-ec "$TWOMORE")
+	ADDRESS=$(bx ec-to-address "$EC_ADDR")
+	show_env COIN AE_PRI ONEMORE TWOMORE EC_ADDR ADDRESS
+	echo
+	echo
+done
+

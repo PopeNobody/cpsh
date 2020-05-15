@@ -1,0 +1,53 @@
+#!/bin/bash
+show_env() {
+  local i
+  for i ; do echo "$i => ${!i}"; done
+}
+
+show_addr()
+{
+  N=$1
+  P=$2
+  C=$3
+  A=$4
+  shift 4
+  echo "derivation:  $P/$C/$A"
+  ACC_EXT_PRI_KEY=$( echo "$ROOT_KEY" |
+    bx hd-private -d -i $P | 
+    bx hd-private -d -i $C |
+    bx hd-private -d -i $A 
+  )
+  show_env ACC_EXT_PRI_KEY 
+
+  B32_EXT_PUB_KEY=$(bx hd-public -i 0 "$ACC_EXT_PRI_KEY")
+  show_env B32_EXT_PUB_KEY
+
+  if [ "$N" == "DASH" ]; then
+    ver="-v 76"
+  else
+    ver=""
+  fi
+  for i in "$@"; do 
+    ADDR_PUB_KEY=$( echo "$B32_EXT_PUB_KEY" |
+      bx hd-public -i $i |
+      bx hd-to-ec
+    )
+    A=$(bx ec-to-address $ver "$ADDR_PUB_KEY")
+    echo N $N P $P C $C A$i $A
+    AS[$i]="$A"
+  done
+}
+gen_keys() {
+  echo "# $(date)"
+  if test -z "$SEED"; then
+    SEED=$( bx mnemonic-to-seed "$@" )
+  fi
+  ROOT_KEY=$(bx hd-new "$SEED")
+  #show_env SEED ROOT_KEY
+  show_addr BTC 44 0 0 0 1 2 3
+  unset AS
+  show_addr BCH 44 145 0 0 1 2 3 
+  show_addr BSV 44 236 0 0 1 2 3 
+  show_addr DASH 44 5 0 0 1 2 3 
+}
+gen_keys "$@" | tee newkey.new

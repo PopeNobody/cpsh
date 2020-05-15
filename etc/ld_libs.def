@@ -1,0 +1,31 @@
+-Wl,--start-group
+-lcoin
+-lcurl -lcurlpp
+-lbitcoin-system
+-lbitcoin-client
+-lbitcoin-protocol
+-lbitcoin-network
+-lqrencode
+-lzmq
+-lncurses
+-lsecp256k1 -lgmp
+-lboost_system
+-lboost_date_time
+-lboost_filesystem
+-lboost_thread
+-lboost_regex
+-lboost_locale
+-lboost_log
+-lpng
+-lboost_program_options
+-lreadline++
+-lhistory++
+-lbitcoin-explorer
+-licudata
+-licuuc
+-licui18n
+-ldl
+-lpthread
+-lpqxx
+-lcoin
+-Wl,--end-group
