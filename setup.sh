@@ -1,6 +1,6 @@
 #!/bin/bash
 
-eval $(gpg < keys.asc)
-
+set -e
+eval "$(cat $HOME/.cpsh/keys.asc | gpg -d )"
 exec bash
 
