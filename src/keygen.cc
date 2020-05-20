@@ -3,6 +3,8 @@
 #include <iostream>
 #include <dbg.hh>
 
+# Example code I jacked.
+
 using namespace bc;
 using namespace bc::system;
 using namespace wallet;
