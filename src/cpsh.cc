@@ -1,109 +1,129 @@
+#include <algorithm>
 #include <bitcoin/explorer.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/range.hpp>
+#include <dbg.hh>
+#include <experimental/source_location>
 #include <iostream>
 #include <readline/history.hh>
 #include <readline/readline.hh>
-#include <experimental/source_location>
-#include <dbg.hh>
 
 using namespace std;
 using namespace bc::system;
 using namespace bc::explorer;
 using namespace bc;
-int signal_hook( void )
+using boost::lexical_cast;
+
+int signal_hook(void)
 {
   xexpose(__PRETTY_FUNCTION__);
   return 0;
 }
 using std::experimental::source_location;
-static std::vector< string > cmds;
-void collect_names( std::shared_ptr< command > cmd )
+static vector<string> xcmds;
+void collect_names(std::shared_ptr<command> cmd)
 {
-  cmds.push_back( cmd->name() );
+  xcmds.push_back(cmd->name());
 }
-char* command_generator( const char* text, int state )
+void pexit(const char* func)
 {
-  static unsigned index = 0;
-  static size_t len = 0;
-  if ( !cmds.size() )
+  perror(func);
+  exit(1);
+};
+using bc::explorer::starts_with;
+char* command_generator(const char* ctext, int state)
+{
+  if (!xcmds.size())
   {
-    broadcast( &collect_names );
+    broadcast(&collect_names);
+    sort(xcmds.begin(),xcmds.end());
   };
-  if ( !state )
-  {
-    index = 0;
-    len = strlen( text );
+  static string text;
+  static vector<string> cmds;
+  static int pos;
+
+  if(!state) {
+    text=ctext;
+    int i=0;
+    cmds.clear();
+    // first, skip everthing that is strictly lower.
+    // any match will be greater to or equal to text.
+    while(i<xcmds.size() && xcmds[i]<text)
+      ++i;
+    while(i<xcmds.size() && starts_with(xcmds[i],text))
+      cmds.push_back(xcmds[i++]);
+    pos=0;
   };
-  while ( index < cmds.size() )
-  {
-    const string& cmd = cmds[ index ];
-    ++index;
-    if ( !strncmp( text, cmd.c_str(), len ) )
-      return strdup( cmd.c_str() );
-  };
-  return 0;
+  if(pos>=cmds.size())
+    return 0;
+  return strdup(cmds[pos++].c_str());
 }
-void show_loc( const string& message,
-               const source_location& loc = source_location::current() )
+void show_loc(const string&          message,
+              const source_location& loc= source_location::current())
 {
   std::cout << loc.file_name() << ":" << loc.line() << ":" << message
             << endl;
 };
-int main( int argc, char** argv )
+template <typename cnt_t>
+string join(const cnt_t& list, const string& del)
 {
-  show_loc("here we are!");
-  // rl_bind_key ('\t', rl_insert);
-  string last_out;
+  return join(vector<string>(list.begin(), list.end()), del);
+};
+vector<string> space_split(string str)
+{
+  vector<string> res;
+  istringstream stream(str);
+  while((stream>>str))
+    res.push_back(str);
+  return res;
+};
+int main(int argc, char** argv)
+{
+  rl_completion_entry_function=&command_generator;
+  cout << "pid: " << getpid() << endl;
+  string prompt="prompt> ";
+  string line;
+  istringstream is;
   ostringstream os;
-  istringstream is( last_out );
-  
-  rl_signal_event_hook = &signal_hook;
-  rl_completion_entry_function = &command_generator;
-  const char* cline;
-  while ( ( cline = readline( "prompt> " ) ) )
-  {
-    vector< string > words = bc::system::split( cline, " " );
-    if ( !words.size() )
-      continue;
-    if ( words[0]=="bx" ) {
-      if(words.size()==1)
-        words[0]="help";
-      else
-        words.erase(words.begin());
-      cout << join(words,"-") << endl;;
-    };
-    string line=join(words," ");
-    rl_free( (void*)cline );
-    cline=line.c_str();
+  while(readline(line,prompt)) {
+    is.str(os.str());
+    os.str("");
+    auto words=space_split(line);
+    line=join(words," ");
+    if(line.size())
+      add_history(line.c_str());
+    vector<const char *> cwords;
+    for( auto &word: words )
+      cwords.push_back(word.c_str());
 
-    if(cline[0])
-      add_history(cline);
-    
-    if ( words[ 0 ] == "mnemonic-to-seed" )
-    {
-      if ( last_out.size() )
-        cout << "discarding buffer: " << last_out << endl;
-      for ( int i = 0; i < 23; i++ )
-        os << "abandon ";
-      os << "art";
-      last_out = os.str();
-      os.str( "" );
-      cout << last_out << endl;
+    if(words[0]=="make-words") {
+      words.clear();
+      while(words.size()<23)
+        words.push_back("abandon");
+      words.push_back("art");
+      for( auto &word : words )
+        os << word << "\n";
+    } else if (words[0]=="show-buf") {
+      string str=is.str();
+      words=space_split(str);
+      
+      for( auto &word : words )
+      {
+        cout << word << " ";
+        os << word << " ";
+      };
+      cout << endl;
+    } else {
+      dispatch_command(
+          cwords.size(),
+          &cwords[0],
+          is,
+          os,
+          cerr);
     };
-    is.str( last_out );
-    vector< const char* > cwords;
-    for ( auto& word : words )
-      cwords.push_back( word.c_str() );
-    dispatch_command( cwords.size() - 1, &cwords[ 0 ], is, os, cerr );
-    auto temp = os.str();
-    if ( temp.size() )
-    {
-      last_out = temp;
-      cout << last_out << endl;
-    };
-    os.str( "" );
   };
   cout << endl;
-  return 0;
 }
+

@@ -1,4 +1,5 @@
--I inc
+-I.
+-Iinc
 -I/home/rfp/include
 -DWITH_ICU
 -DSYSCONFDIR="\"/home/rfp/stow/bx/etc\""

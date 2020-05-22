@@ -1,5 +1,6 @@
 -L/home/rfp/lib
 -g
 -Llib
+-static
 
 

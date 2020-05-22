@@ -1,5 +1,4 @@
 -Wl,--start-group
--lcoin
 -lcurl -lcurlpp
 -lbitcoin-system
 -lbitcoin-client
@@ -27,5 +26,4 @@
 -ldl
 -lpthread
 -lpqxx
--lcoin
 -Wl,--end-group

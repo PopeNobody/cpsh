@@ -1,24 +1,21 @@
-default: fake_tgt
-	make -f Makefile 2>&1 $(MAKE_FLAGS) | tee log/make.log
+MAKEFLAGS:=-R -r 
+all:
+include Makefile.avoid
+include etc/make_default_target.mk
+include etc/make_jobs.mk
 
-%: fake_tgt
-	make  -f Makefile $@ 2>&1 $(MAKE_FLAGS) | tee log/make.log
-	
-CF_DEFS:=$(wildcard etc/*.def)
-CF_FILE:=$(patsubst %.def,%,$(CF_DEFS))
-CF_PRES:=$(wildcard $(CF_FILE))
-CF_MISS:=$(filter-out $(CF_PRES), $(CF_FILE))
+all:
 
-
-Makefile GNUmakefile:;
-
-MAKE_FLAGS:= -Rr --warn-undefined-variable
+default: $(MAKECMDGOALS)
 
 
-fake_tgt: $(CF_MISS)
-	@echo missing files added
+ifneq (,$(MAKECMDGOALS))
+$(MAKECMDGOALS):
+	${MAKE} -f Makefile $(MAKECMDGOALS)
+endif
 
-$(CF_MISS): %: %.def
-	cp $< $@
 
-.PHONY: 
+all:
+	${MAKE} -f Makefile all
+
+
