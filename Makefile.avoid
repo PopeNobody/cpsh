@@ -1,0 +1,15 @@
+
+
+STATIC:=
+STATIC+=Makefile.avoid
+STATIC+=GNUmakefile
+STATIC+=etc/make_default_target.mk
+STATIC+=etc/make_jobs.mk
+
+$(STATIC): ;
+
+Makefile: Makefile.in config.status
+	./config.status Makefile
+
+
+.PHONY: all install clean test check default
