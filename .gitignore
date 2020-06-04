@@ -12,4 +12,9 @@ etc/ld_libs
 make.out
 newkey.new
 run_gdb.sh
+**.ii
+**.dd
+**.oo
 tags
+**.a
+**.a.lock

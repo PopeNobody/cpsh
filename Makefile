@@ -7,17 +7,10 @@ all:
 CXX:=/usr/stow/llvm-10a/bin/clang++ 
 AR:= ar
 
-ifeq (0,0)
 CXXFLAGS = @etc/cxxflags
 CPPFLAGS = @etc/cppflags
 LDFLAGS = @etc/ld_flags
 LDLIBS = @etc/ld_libs
-else
-CXXFLAGS  =  $(shell  cat  etc/cxxflags  )
-CPPFLAGS  =  $(shell  cat  etc/cppflags  )
-LDFLAGS   =  $(shell  cat  etc/ld_flags   )
-LDLIBS    =  $(shell  cat  etc/ld_libs    )
-endif
 ARFLAGS = $(shell cat etc/ar_flags)
 
 ALL_DEPS = $(patsubst %,%.dd,$(ALL_SRC))
@@ -73,10 +66,12 @@ $(SH_SCRS): bin/%: scr/%.sh
 scripts: $(ALL_SCRS)
 
 $(TESTS): bin/test-%: tst/%.cc.oo lib/libcoin.a etc/ld_flags etc/ld_libs
+	${MAKE} -C readline all
 	@echo making $< into $@
 	$(CXX) $(LDFLAGS) $< -o $@ $(LDLIBS)
 
 $(PROGS): bin/%: src/%.cc.oo lib/libcoin.a etc/ld_flags etc/ld_libs
+	${MAKE} -C readline all
 	@echo making $< into $@
 	mkdir -p bin
 	$(CXX) $(LDFLAGS) $< -o $@ $(LDLIBS)
