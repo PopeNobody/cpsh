@@ -4,12 +4,12 @@ include etc/make_jobs.mk
 
 all: 
 
-CXX:=/usr/stow/llvm-10a/bin/clang++ 
+CXX:=g++
 AR:= ar
 
 ifeq (0,0)
 CXXFLAGS = @etc/cxxflags
-CPPFLAGS = @etc/cppflags
+CPPFLAGS = @etc/cppflags -I$(HOME)/include
 LDFLAGS = @etc/ld_flags
 LDLIBS = @etc/ld_libs
 else
@@ -31,11 +31,11 @@ ALL_SRC+= $(TESTS_SRC)
 TESTS_OBJ:=$(patsubst %.cc,%.oo,$(TESTS_SRC))
 TESTS:=$(patsubst tst/%.cc,bin/test-%,$(TESTS_SRC))
 
-PROGS_SRC:=$(wildcard src/*.cc)
+PROGS_SRC:=$(wildcard bin/*.cc)
 ALL_SRC+= $(PROGS_SRC)
 PROGS_OBJ:=$(patsubst %.cc,%.oo,$(PROGS_SRC))
-PROGS:=$(patsubst src/%.cc,bin/%,$(PROGS_SRC))
-SH_SCRS:=$(patsubst scr/%.sh,bin/%,$(wildcard src/*.sh))
+PROGS:=$(patsubst bin/%.cc,bin/%,$(PROGS_SRC))
+SH_SCRS:=$(patsubst scr/%.sh,bin/%,$(wildcard bin/*.sh))
 PL_SCRS:=$(patsubst scr/%.pl,bin/%,$(wildcard scr/*.pl))
 ALL_SCRS:=$(SH_SCRS) $(PL_SCRS)
 ALL_SCRS+=
@@ -76,7 +76,9 @@ $(TESTS): bin/test-%: tst/%.cc.oo lib/libcoin.a etc/ld_flags etc/ld_libs
 	@echo making $< into $@
 	$(CXX) $(LDFLAGS) $< -o $@ $(LDLIBS)
 
-$(PROGS): bin/%: src/%.cc.oo lib/libcoin.a etc/ld_flags etc/ld_libs
+$(PROGS): bin/%: bin/%.cc.oo lib/libcoin.a etc/ld_flags etc/ld_libs
+	@echo checking readline
+	${MAKE} -C readline libreadline++.a libhistory++.a
 	@echo making $< into $@
 	mkdir -p bin
 	$(CXX) $(LDFLAGS) $< -o $@ $(LDLIBS)

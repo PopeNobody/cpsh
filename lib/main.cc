@@ -1,4 +1,3 @@
-#include "pqxx/except.hxx"
 #include <coinfwd.hh>
 #include <dbg.hh>
 
