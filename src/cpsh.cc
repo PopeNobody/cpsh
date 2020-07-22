@@ -85,12 +85,11 @@ int main(int argc, char** argv)
   cout << "pid: " << getpid() << endl;
   string prompt="prompt> ";
   string line;
-  istringstream is;
-  ostringstream os;
+  string buf;
   while(readline(line,prompt)) {
-    is.str(os.str());
-    os.str("");
     auto words=space_split(line);
+    if(words.size() && words[0]=="bx")
+      words=vector<string>(words.begin()+1,words.end());
     line=join(words," ");
     if(line.size())
       add_history(line.c_str());
@@ -98,6 +97,8 @@ int main(int argc, char** argv)
     for( auto &word: words )
       cwords.push_back(word.c_str());
 
+    istringstream is(buf);
+    ostringstream os;
     if(words[0]=="make-words") {
       words.clear();
       while(words.size()<23)
@@ -122,7 +123,10 @@ int main(int argc, char** argv)
           is,
           os,
           cerr);
+      if(words[0]=="help")
+        cout << os.str() << endl;
     };
+    buf=os.str();
   };
   cout << endl;
 }

@@ -4,7 +4,7 @@ include etc/make_jobs.mk
 
 all: 
 
-CXX:=/usr/stow/llvm-10a/bin/clang++ 
+CXX:=g++
 AR:= ar
 
 CXXFLAGS = @etc/cxxflags

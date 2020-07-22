@@ -25,5 +25,4 @@
 -licui18n
 -ldl
 -lpthread
--lpqxx
 -Wl,--end-group
